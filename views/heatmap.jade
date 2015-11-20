@@ -1,0 +1,18 @@
+extends layout
+
+block head
+  script(src='http://d3js.org/d3.v3.min.js', charset='utf-8')
+
+block content
+  h1= title
+  p
+    a(href='/') Home
+    |  | 
+    a(href='/heatmap/1') 1min
+    |  | 
+    a(href='/heatmap/5') 5min
+    |  | 
+    a(href='/heatmap/15') 15min
+  svg(id='graph', width='700', height='700')
+    image(x='0', y='0', width='700', height='700', xlink:href='/images/place.png')
+  script(src='/javascripts/heatmap.js')

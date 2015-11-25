@@ -1,0 +1,15 @@
+extends layout
+
+block head
+  script(src='http://d3js.org/d3.v3.min.js', charset='utf-8')
+  script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDdyh3Isb6A7whxrfb-Tf96-5PLH0hZk7Y')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js')
+  link(rel='stylesheet', href='/stylesheets/maps.css')
+
+block content
+  h1= title
+  p
+    a(href='/') Home
+  div(class='map-embed')
+    div(id='map')
+  script(src='/javascripts/shop.js')

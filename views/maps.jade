@@ -1,0 +1,23 @@
+extends layout
+
+block head
+  script(src='http://d3js.org/d3.v3.min.js', charset='utf-8')
+  script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDdyh3Isb6A7whxrfb-Tf96-5PLH0hZk7Y')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js')
+  link(rel='stylesheet', href='/stylesheets/maps.css')
+
+block content
+  h1= title
+  p
+    a(href='/') Home
+    |  | 
+    a(href='/map') 渋谷
+    |  | 
+    a(href='/map?lat=35.691235&lng=139.700174') 新宿
+    |  | 
+    a(href='/map?lat=35.680971&lng=139.765927') 東京
+    |  | 
+    a(href='/map?lat=35.576667&lng=139.659515') 武蔵小杉
+  div(class='map-embed')
+    div(id='map')
+  script(src='/javascripts/maps.js')

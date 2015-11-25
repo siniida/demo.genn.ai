@@ -20,7 +20,6 @@
         initPlace.lng = point[1];
       }
     }
-    console.log(place);
 
     canvas = document.getElementById("map");
     latlng = new google.maps.LatLng(initPlace.lat, initPlace.lng);
@@ -32,13 +31,6 @@
     };
 
     map = new google.maps.Map(canvas, mapOptions);
-
-/*
-    google.maps.event.addListener(map, "center_changed", function () {
-      // console.log(map.getCenter().toString());
-      console.log(map.getBounds().toString());
-    });
-*/
 
     google.maps.event.addListener(map, "zoom_changed", function () {
       getData();
@@ -59,9 +51,6 @@
       for (var i = 0; i < data.length; i++) {
 
         opa = data[i].cnt / 100 + 0.3 > 1 ? 1.0 : data[i].cnt / 100 + 0.3;
-        if (opa > 1) {
-          console.log(data[i]);
-        }
 
         opt = {
           map: map,
@@ -78,7 +67,6 @@
             after[data[i]._id].map = before[data[i]._id].map;
             delete(before[data[i]._id]);
           } else {
-            // console.log('modify! : ' + before[data[i]._id].cnt + " -> " + data[i].cnt);
             after[data[i]._id].map = new google.maps.Circle(opt);
           }
         } else {

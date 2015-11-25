@@ -34,4 +34,17 @@ router.get('/data', function(req, res, next) {
 
 });
 
+router.get('/shop', function(req, res, next) {
+  res.render('shop', {title: 'Shop'});
+});
+
+router.get('/shop/data', function(req, res, next) {
+  MongoClient.connect("mongodb://tf0054_mongo:27017/gennai", function(err, db) {
+    db.collection("shop").find().toArray(function(err, docs){
+      res.json(docs);
+      db.close();
+    });
+  });
+});
+
 module.exports = router;

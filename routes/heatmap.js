@@ -50,7 +50,7 @@ router.get('/data/:min', function(req, res, next){
   var now = new Date();
 
   MongoClient.connect(url, function(err, db) {
-    db.collection("arrive" + req.params.min + "min")
+    db.collection("arrive")
         .find({cp_id: {$in: ids}})
         .toArray(function(err, docs) {
       var result = [];
@@ -59,7 +59,8 @@ router.get('/data/:min', function(req, res, next){
           if (ids[i] == docs[j].cp_id) {
             if (docs[j].time) {
               if (now.getTime() - (new Date(docs[j].time)).getTime() < 5 * 60 * 1000) {
-                result.push(docs[j].cnt);
+                // result.push(docs[j].cnt);
+                result.push(docs[j]['cnt_' + req.params.min + 'min']);
               } else {
                 result.push(0);
               }

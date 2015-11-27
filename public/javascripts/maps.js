@@ -9,7 +9,7 @@
   var baseUrl = "/map/data";
 
   function init () {
-    var canvas, latlng, mapOptions, place, point;
+    var canvas, latlng, mapOptions, styleOptions, place, point;
 
     place = location.search.substring(1).split("&");
     for (var i = 0; i < place.length; i++) {
@@ -27,10 +27,24 @@
     mapOptions = {
       zoom: 17,
       minZoom: 16,
-      center: latlng
+      center: latlng,
+      streetViewControl: false
     };
 
     map = new google.maps.Map(canvas, mapOptions);
+
+    styleOptions = [{
+      featureType: "all",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }]
+    }, {
+      featureType: "transit.station",
+      elementType: "labels",
+      stylers: [{ visibility: "on" }]
+    }];
+
+    map.mapTypes.set("noText", new google.maps.StyledMapType(styleOptions));
+    map.setMapTypeId("noText");
 
     google.maps.event.addListener(map, "zoom_changed", function () {
       getData();

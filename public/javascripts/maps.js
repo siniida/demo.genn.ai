@@ -64,7 +64,7 @@
 
       for (var i = 0; i < data.length; i++) {
 
-        opa = data[i].cnt / 100 + 0.3 > 1 ? 1.0 : data[i].cnt / 100 + 0.3;
+        opa = data[i].cnt_5min / 100 + 0.3 > 1 ? 1.0 : data[i].cnt_5min / 100 + 0.3;
 
         opt = {
           map: map,
@@ -77,7 +77,7 @@
 
         after[data[i]._id] = data[i];
         if (data[i]._id in before) {
-          if (before[data[i]._id].cnt == data[i].cnt) {
+          if (before[data[i]._id].cnt_5min == data[i].cnt_5min) {
             after[data[i]._id].map = before[data[i]._id].map;
             delete(before[data[i]._id]);
           } else {

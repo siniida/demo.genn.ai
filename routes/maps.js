@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var MongoClient = require('mongodb').MongoClient;
-var mongoUrl = 'mongodb://tf0054_mongo:27017/output';
+var mongoUrl = 'mongodb://mongo:27017/output';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -39,7 +39,7 @@ router.get('/shop', function(req, res, next) {
 });
 
 router.get('/shop/data', function(req, res, next) {
-  MongoClient.connect("mongodb://tf0054_mongo:27017/gennai", function(err, db) {
+  MongoClient.connect("mongodb://mongo:27017/gennai", function(err, db) {
     db.collection("shop").find().toArray(function(err, docs){
       res.json(docs);
       db.close();
@@ -56,11 +56,12 @@ router.get('/route/data', function(req, res, next) {
   var sw = (req.query.sw).split(',');
   var ne = (req.query.ne).split(',');
   var time = new Date().getTime() - 3 * 60 * 60 * 1000; // 5hour
+  var cnt = req.query.cnt ? parseInt(req.query.cnt, 10) : 1;
 
   MongoClient.connect(mongoUrl, function(err, db) {
     db.collection("route")
         .find({$and: [
-          {cnt: {$gt: 1}},
+          {cnt: {$gt: cnt}},
 //          {time: {$gt: new Date(time)}},
           {"start_point.lat": {$ne: "0"}},
           {"start_point.lon": {$ne: "0"}},

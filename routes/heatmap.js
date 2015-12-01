@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://tf0054_mongo:27017/output';
+var url = 'mongodb://mongo:27017/output';
 
 /* GET Heatmap demo page. */
 router.get('/', function(req, res, next) {

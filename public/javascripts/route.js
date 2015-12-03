@@ -1,6 +1,6 @@
 (function(){
 
-  var map = null, lines = [];
+  var map, lines = [], markers = {}, route = [];
 
   var initPlace = {
     lat: 35.658676,
@@ -43,11 +43,19 @@
 
     map.mapTypes.set("noText", new google.maps.StyledMapType(styleOptions));
     map.setMapTypeId("noText");
-
-    google.maps.event.addListener(map, "zoom_changed", function () {
-      getData();
-    });
   }
+
+  function clear() {
+    // clear
+    for (var mark in markers) {
+      markers[mark].setMap(null);
+    }
+    markers = {};
+    for (var i = 0; i < lines.length; i++) {
+      lines[i].setMap(null);
+    }
+    lines = [];
+  };
 
   function getData () {
 
@@ -57,22 +65,62 @@
     if (zoom < 15 && cnt < 10) {
       return;
     }
+    var url;
 
     var latlng = map.getBounds();
     var sw = latlng.getSouthWest();
     var ne = latlng.getNorthEast();
 
-    for (var i = 0; i < lines.length; i++) {
-      lines[i].setMap(null);
-    }
+    clear();
 
-    lines = [];
+    // shop data
+    url = "/map/route/shop/area"
+            + "?sw=" + sw.lat() + "," + sw.lng()
+            + "&ne=" + ne.lat() + "," + ne.lng()
+    $.get(url, function(data) {
+
+      var marker, sid;
+      for (var i = 0; i < data.length; i++) {
+        sid = data[i].store_id;
+
+        if (markers[sid]) {
+          continue;
+        }
+
+        marker = new google.maps.Marker({
+          map: map,
+          position: new google.maps.LatLng(data[i].store_point.lat, data[i].store_point.lon),
+          title: data[i].store_id.toString()
+        });
+
+        google.maps.event.addListener(marker, "dblclick", function() {
+          var url = "/map/route/shop/" + this.getTitle() + '?cnt=' + cnt;
+
+          // push
+          route.push(new google.maps.Marker({
+            map: map,
+            position: new google.maps.LatLng(this.getPosition().lat(), this.getPosition().lng()),
+            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+          }));
+
+          clear();
+
+          $.get(url, function(data) {
+            drawRoute(data);
+          });
+        });
+
+        markers[sid] = marker;
+      }
+    });
+
 
     // api
-    var url = '/map/route/data'
+    url = '/map/route/data'
             + '?sw=' + sw.lat() + ',' + sw.lng()
             + '&ne=' + ne.lat() + ',' + ne.lng()
             + '&cnt=' + cnt;
+
     $.get(url, function(data) {
       console.log(data.length);
       var weight = 1;
@@ -100,6 +148,67 @@
         );
       }
     });
+  }
+
+  function drawRoute(data) {
+
+    var marker, sid, label;
+    for (var i = 0; i < data.length; i++) {
+
+      sid = data[i].end_store;
+      label = i < 9 ? i + 1 : " ";
+
+      marker = new google.maps.Marker({
+        map: map,
+        position: new google.maps.LatLng(data[i].end_point.lat, data[i].end_point.lon),
+        label: { text: label.toString() },
+        title: data[i].end_store.toString()
+      });
+
+      google.maps.event.addListener(marker, "dblclick", function() {
+        
+        route.push(new google.maps.Marker({
+          map: map,
+          position: new google.maps.LatLng(this.getPosition().lat(), this.getPosition().lng()),
+          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }));
+
+        var before = route[route.length - 2];
+        var after  = route[route.length - 1];
+
+        new google.maps.Polyline({
+          map: map,
+          path: [
+            new google.maps.LatLng(before.getPosition().lat(), before.getPosition().lng()),
+            new google.maps.LatLng(after.getPosition().lat(), after.getPosition().lng()),
+          ],
+          strokeColor: "blue",
+          strokeWeight: 3
+        });
+
+        clear();
+
+        var cnt = $('#cnt')[0].value;
+        var url = "/map/route/shop/" + this.getTitle() + "?cnt=" + cnt;
+        $.get(url, function(data) {
+          drawRoute(data);
+        });
+      });
+
+      lines.push(
+        new google.maps.Polyline({
+          map: map,
+          path: [
+            new google.maps.LatLng(data[i].start_point.lat, data[i].start_point.lon),
+            new google.maps.LatLng(data[i].end_point.lat, data[i].end_point.lon)
+          ],
+          strokeColor: "blue",
+          strokeWeight: 1
+        })
+      );
+
+     markers[sid] = marker;
+    }
   }
 
   $("#reload").on("click", function() {

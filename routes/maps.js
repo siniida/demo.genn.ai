@@ -88,4 +88,60 @@ router.get('/route/data', function(req, res, next) {
   });
 });
 
+router.get('/route/shop/area', function(req, res, next) {
+  var sw = (req.query.sw).split(',');
+  var ne = (req.query.ne).split(',');
+
+  MongoClient.connect('mongodb://mongo:27017/gennai', function(err, db) {
+    db.collection('shop')
+        .find({$and: [
+          {'store_point.lat': {$gt: sw[0]}},
+          {'store_point.lon': {$gt: sw[1]}},
+          {'store_point.lat': {$lt: ne[0]}},
+          {'store_point.lon': {$lt: ne[1]}}
+        ]})
+        .toArray(function(err, docs) {
+      res.json(docs);
+      db.close();
+    });
+  });
+});
+
+router.get('/route/shop/:id', function(req, res, next) {
+
+  var cnt = req.query.cnt ? parseInt(req.query.cnt, 10) : 0;
+
+  MongoClient.connect(mongoUrl, function(err, db) {
+    db.collection("route")
+        .find({$and: [
+          {"start_store": parseInt(req.params.id)},
+          {"end_point.lat": {$ne: "0"}},
+          {"end_point.lon": {$ne: "0"}},
+          {"cnt": {$gt: cnt}}
+        ]})
+        .sort({"cnt": -1})
+        .toArray(function(err, docs) {
+      res.json(docs);
+      db.close();
+    });
+  });
+});
+
+router.get('/route/shop/point', function(req, res, next) {
+  var lat = req.query.lat;
+  var lng = req.query.lng;
+
+  MongoClient.connect("mongodb://mongo:27017/gennai", function(err, db) {
+    db.collection("shop")
+        .find({$and: [
+          {"store_point.lat": lat},
+          {"store_point.lon": lng}
+        ]})
+        .toArray(function(err, docs) {
+      res.json(docs);
+      db.close();
+    });
+  });
+});
+
 module.exports = router;
